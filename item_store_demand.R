@@ -222,5 +222,64 @@ p4 <- fullfit %>%
 ## let's put the plots together
 plotly::subplot(p1,p3,p2,p4,nrows=2)
 
-  
+
+
+## hw 31 facebook prophet model
+prophet_model <- prophet_reg() %>%
+  set_engine(engine = "prophet") %>%
+  fit(sales ~ date, data = training(arima_cv_split))
+
+# tune the models
+prophet_arima_cv_results <- modeltime_calibrate(prophet_model,
+                                        new_data = testing(arima_cv_split))
+
+## visualize the results
+prophet_p1 <- prophet_arima_cv_results %>%
+  modeltime_forecast(
+    new_data = testing(arima_cv_split),
+    actual_data = training(arima_cv_split)
+  ) %>%
+  plot_modeltime_forecast(.interactive=FALSE)
+
+## tune to whole dataset
+prophet_fullfit <- prophet_arima_cv_results %>%
+  modeltime_refit(data=storeItemTrain)
+
+## predict for the whole dataset
+prophet_p2 <- prophet_fullfit %>%
+  modeltime_forecast(
+    new_data = storeItemTest,
+    actual_data = storeItemTrain) %>%
+  plot_modeltime_forecast(.interactive=FALSE)
+
+## now for the other store item combo we'll do the same thing
+prophet_model2 <- prophet_reg() %>%
+  set_engine(engine = "prophet") %>%
+  fit(sales ~ date, data = training(arima_cv_split2))
+
+# tune the models
+prophet_arima_cv_results2 <- modeltime_calibrate(prophet_model2,
+                                                new_data = testing(arima_cv_split2))
+## visualize the results
+prophet_p3 <- prophet_arima_cv_results2 %>%
+  modeltime_forecast(
+    new_data = testing(arima_cv_split2),
+    actual_data = training(arima_cv_split2)
+  ) %>%
+  plot_modeltime_forecast(.interactive=FALSE)
+
+## tune to whole dataset
+prophet_fullfit2 <- prophet_arima_cv_results2 %>%
+  modeltime_refit(data=storeItemTrain2)
+
+## predict for the whole dataset
+prophet_p4 <- prophet_fullfit2 %>%
+  modeltime_forecast(
+    new_data = storeItemTest2,
+    actual_data = storeItemTrain2) %>%
+  plot_modeltime_forecast(.interactive=FALSE)
+
+## let's put the plots together
+hw31 <- plotly::subplot(prophet_p1,prophet_p3,prophet_p2,prophet_p4,nrows=2)
+
 
