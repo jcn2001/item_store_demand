@@ -282,4 +282,3 @@ prophet_p4 <- prophet_fullfit2 %>%
 ## let's put the plots together
 hw31 <- plotly::subplot(prophet_p1,prophet_p3,prophet_p2,prophet_p4,nrows=2)
 
-
